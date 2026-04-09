@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GTECH Enterprise – Fast & Reliable Internet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #0A1F44;
+      --navy-mid: #132c5e;
+      --navy-light: #1a3a7a;
+      --blue: #3A86FF;
+      --blue-light: #6aa8ff;
+      --white: #FFFFFF;
+      --off-white: #f4f7fc;
+      --text-muted: #7a8faf;
+      --card-bg: #ffffff;
+      --border: rgba(58,134,255,0.15);
+      --shadow: 0 8px 40px rgba(10,31,68,0.10);
+      --shadow-hover: 0 20px 60px rgba(10,31,68,0.18);
+      --radius: 18px;
+      --radius-sm: 10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--off-white);
+      color: var(--navy);
+      overflow-x: hidden;
+    }
+
+    /* ── LOADER ── */
+    #loader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--navy);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 20px;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-logo {
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 2rem;
+      color: var(--white); letter-spacing: 0.05em;
+    }
+    .loader-logo span { color: var(--blue); }
+    .loader-bar {
+      width: 180px; height: 3px; background: rgba(255,255,255,0.1);
+      border-radius: 99px; overflow: hidden;
+    }
+    .loader-bar-fill {
+      height: 100%; width: 0; background: var(--blue);
+      border-radius: 99px;
+      animation: fill 1.4s ease forwards;
+    }
+    @keyframes fill { to { width: 100%; } }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      padding: 0 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+      background: rgba(10,31,68,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(58,134,255,0.12);
+      transition: box-shadow 0.3s;
+    }
+    nav.scrolled { box-shadow: 0 4px 30px rgba(10,31,68,0.3); }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.25rem;
+      color: var(--white); text-decoration: none; letter-spacing: 0.03em;
+    }
+    .nav-brand span { color: var(--blue); }
+    .nav-brand img { height: 38px; width: auto; border-radius: 6px; }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      color: rgba(255,255,255,0.75); text-decoration: none;
+      font-size: 0.9rem; font-weight: 500; letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      background: var(--blue); color: var(--white);
+      padding: 9px 22px; border-radius: 99px; border: none;
+      font-family: 'Sora', sans-serif; font-weight: 600; font-size: 0.85rem;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { background: var(--blue-light); transform: translateY(-1px); }
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px;
+    }
+    .hamburger span {
+      width: 24px; height: 2px; background: var(--white); border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .mobile-menu {
+      display: none; position: fixed; inset: 72px 0 0;
+      background: var(--navy); flex-direction: column;
+      align-items: center; justify-content: center; gap: 32px;
+      z-index: 999;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      color: var(--white); text-decoration: none;
+      font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 600;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 50%, #0d2a6b 100%);
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+      padding: 120px 5% 80px;
+    }
+    .hero-bg-circle {
+      position: absolute; border-radius: 50%;
+      background: radial-gradient(circle, rgba(58,134,255,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-bg-circle:nth-child(1) { width: 700px; height: 700px; top: -200px; right: -150px; }
+    .hero-bg-circle:nth-child(2) { width: 400px; height: 400px; bottom: -100px; left: -100px; }
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 60px; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;
+      position: relative; z-index: 1;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(58,134,255,0.15); border: 1px solid rgba(58,134,255,0.3);
+      color: var(--blue-light); padding: 7px 16px; border-radius: 99px;
+      font-size: 0.8rem; font-weight: 500; margin-bottom: 24px;
+      animation: fadeUp 0.8s ease forwards;
+    }
+    .hero-badge::before { content: '●'; font-size: 0.5rem; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero h1 {
+      font-family: 'Sora', sans-serif; font-weight: 800;
+      font-size: clamp(2.2rem, 4vw, 3.5rem); line-height: 1.15;
+      color: var(--white); margin-bottom: 20px;
+      animation: fadeUp 0.9s ease 0.1s both;
+    }
+    .hero h1 em { color: var(--blue); font-style: normal; }
+    .hero p {
+      color: rgba(255,255,255,0.65); font-size: 1.05rem; line-height: 1.7;
+      margin-bottom: 36px; max-width: 480px;
+      animation: fadeUp 1s ease 0.2s both;
+    }
+    .hero-btns {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      animation: fadeUp 1s ease 0.3s both;
+    }
+    .btn-primary {
+      background: var(--blue); color: var(--white);
+      padding: 14px 30px; border-radius: 99px; border: none;
+      font-family: 'Sora', sans-serif; font-weight: 600; font-size: 0.95rem;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.25s; display: inline-block;
+      box-shadow: 0 4px 20px rgba(58,134,255,0.4);
+    }
+    .btn-primary:hover { background: var(--blue-light); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(58,134,255,0.5); }
+    .btn-outline {
+      background: transparent; color: var(--white);
+      padding: 14px 30px; border-radius: 99px;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      font-family: 'Sora', sans-serif; font-weight: 600; font-size: 0.95rem;
+      cursor: pointer; text-decoration: none;
+      transition: all 0.25s; display: inline-block;
+    }
+    .btn-outline:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-2px); }
+    .hero-visual {
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeUp 1s ease 0.4s both;
+    }
+    .hero-card-stack { position: relative; width: 100%; max-width: 420px; }
+    .speed-card {
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius); padding: 28px; backdrop-filter: blur(20px);
+      position: relative;
+    }
+    .speed-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .speed-label { color: rgba(255,255,255,0.5); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; }
+    .speed-badge { background: rgba(58,134,255,0.2); color: var(--blue-light); padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
+    .speed-num {
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 4rem;
+      color: var(--white); line-height: 1; margin-bottom: 4px;
+    }
+    .speed-unit { color: var(--blue-light); font-size: 1rem; margin-bottom: 20px; }
+    .speed-bars { display: flex; gap: 4px; align-items: flex-end; height: 50px; }
+    .speed-bar {
+      flex: 1; background: var(--blue); border-radius: 4px 4px 0 0;
+      animation: barGrow 1.5s ease forwards;
+      transform-origin: bottom;
+    }
+    @keyframes barGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+    .mini-stat {
+      background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px;
+      text-align: center;
+    }
+    .mini-stat-val { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--white); }
+    .mini-stat-lbl { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .floating-pill {
+      position: absolute; background: var(--blue); color: var(--white);
+      padding: 8px 16px; border-radius: 99px;
+      font-family: 'Sora', sans-serif; font-weight: 600; font-size: 0.8rem;
+      box-shadow: 0 8px 24px rgba(58,134,255,0.4);
+      animation: float 3s ease-in-out infinite;
+    }
+    .floating-pill:nth-child(2) { top: -18px; right: 30px; }
+    .floating-pill:nth-child(3) { bottom: -16px; left: 20px; animation-delay: 1.5s; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ── SECTION LAYOUT ── */
+    section { padding: 90px 5%; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+    .section-tag {
+      display: inline-block; background: rgba(58,134,255,0.1); color: var(--blue);
+      padding: 6px 16px; border-radius: 99px; font-size: 0.78rem;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: 'Sora', sans-serif; font-weight: 800;
+      font-size: clamp(1.8rem, 3vw, 2.6rem); margin-bottom: 14px; color: var(--navy);
+    }
+    .section-sub { color: var(--text-muted); font-size: 1rem; max-width: 520px; line-height: 1.7; margin-bottom: 50px; }
+
+    /* ── HOTSPOT PACKAGES ── */
+    #packages { background: var(--white); }
+    .packages-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+    .pkg-card {
+      background: var(--card-bg); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 32px 24px; text-align: center;
+      transition: all 0.3s; cursor: pointer; position: relative; overflow: hidden;
+    }
+    .pkg-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--navy), var(--blue));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .pkg-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: var(--shadow-hover); border-color: var(--blue); }
+    .pkg-card:hover::before { opacity: 1; }
+    .pkg-card:hover * { color: var(--white) !important; }
+    .pkg-card:hover .pkg-buy { background: var(--white) !important; color: var(--navy) !important; }
+    .pkg-icon { font-size: 2.5rem; margin-bottom: 16px; position: relative; z-index: 1; }
+    .pkg-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--navy); margin-bottom: 8px; position: relative; z-index: 1; }
+    .pkg-price { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 2.2rem; color: var(--blue); position: relative; z-index: 1; }
+    .pkg-price span { font-size: 1rem; font-weight: 500; color: var(--text-muted); }
+    .pkg-duration { color: var(--text-muted); font-size: 0.9rem; margin: 10px 0 24px; position: relative; z-index: 1; }
+    .pkg-buy {
+      background: var(--blue); color: var(--white); border: none;
+      padding: 11px 24px; border-radius: 99px; font-family: 'Sora', sans-serif;
+      font-weight: 600; font-size: 0.85rem; cursor: pointer; width: 100%;
+      transition: all 0.25s; position: relative; z-index: 1;
+    }
+    .pkg-buy:hover { opacity: 0.9; }
+    .pkg-card.popular { border-color: var(--blue); }
+    .popular-tag {
+      position: absolute; top: 14px; right: 14px; z-index: 2;
+      background: var(--blue); color: var(--white);
+      padding: 3px 10px; border-radius: 99px; font-size: 0.68rem; font-weight: 700;
+    }
+
+    /* ── MONTHLY PLANS ── */
+    #monthly {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+      position: relative; overflow: hidden;
+    }
+    #monthly .section-title { color: var(--white); }
+    #monthly .section-sub { color: rgba(255,255,255,0.55); }
+    #monthly .section-tag { background: rgba(58,134,255,0.2); color: var(--blue-light); }
+    #monthly::before {
+      content: ''; position: absolute; width: 600px; height: 600px;
+      border-radius: 50%; right: -200px; top: -200px;
+      background: radial-gradient(circle, rgba(58,134,255,0.15) 0%, transparent 70%);
+    }
+    .monthly-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; position: relative; z-index: 1; }
+    .monthly-card {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius); padding: 32px 24px;
+      transition: all 0.3s; position: relative; text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .monthly-card:hover { transform: translateY(-8px); background: rgba(255,255,255,0.1); border-color: rgba(58,134,255,0.5); box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+    .monthly-card.best {
+      background: var(--blue); border-color: var(--blue);
+      transform: scale(1.04);
+    }
+    .monthly-card.best:hover { transform: scale(1.04) translateY(-8px); }
+    .best-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: #FFD700; color: var(--navy); padding: 4px 16px;
+      border-radius: 99px; font-size: 0.72rem; font-weight: 700;
+      white-space: nowrap; letter-spacing: 0.04em;
+    }
+    .monthly-icon { font-size: 2rem; margin-bottom: 14px; }
+    .monthly-speed { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 2.4rem; color: var(--white); }
+    .monthly-speed-unit { color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 10px; }
+    .monthly-price { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1.5rem; color: var(--white); margin-bottom: 6px; }
+    .monthly-period { color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 22px; }
+    .monthly-feature { font-size: 0.82rem; color: rgba(255,255,255,0.65); margin-bottom: 8px; }
+    .monthly-btn {
+      background: rgba(255,255,255,0.15); color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.3); padding: 11px 0; width: 100%;
+      border-radius: 99px; font-family: 'Sora', sans-serif; font-weight: 600;
+      font-size: 0.85rem; cursor: pointer; transition: all 0.25s; margin-top: 18px;
+    }
+    .monthly-btn:hover { background: rgba(255,255,255,0.25); }
+    .monthly-card.best .monthly-btn { background: var(--white); color: var(--blue); border-color: var(--white); }
+    .monthly-card.best .monthly-btn:hover { background: var(--off-white); }
+    .monthly-note {
+      text-align: center; margin-top: 28px; color: rgba(255,255,255,0.45);
+      font-size: 0.82rem; position: relative; z-index: 1;
+    }
+
+    /* ── WHY CHOOSE US ── */
+    #why { background: var(--off-white); }
+    .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+    .why-card {
+      background: var(--white); border-radius: var(--radius); padding: 32px 24px;
+      border: 1.5px solid var(--border); transition: all 0.3s;
+    }
+    .why-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); border-color: var(--blue); }
+    .why-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: rgba(58,134,255,0.08); display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 18px;
+    }
+    .why-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 1rem; color: var(--navy); margin-bottom: 8px; }
+    .why-desc { color: var(--text-muted); font-size: 0.88rem; line-height: 1.65; }
+
+    /* ── CONTACT ── */
+    #contact {
+      background: var(--white);
+    }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+    .contact-info { }
+    .contact-info h3 { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1.8rem; color: var(--navy); margin-bottom: 16px; }
+    .contact-info p { color: var(--text-muted); line-height: 1.7; margin-bottom: 32px; }
+    .contact-item {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 20px;
+    }
+    .contact-icon {
+      width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
+      background: rgba(58,134,255,0.1); display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .contact-text strong { display: block; font-weight: 600; font-size: 0.85rem; color: var(--navy); margin-bottom: 2px; }
+    .contact-text span { color: var(--text-muted); font-size: 0.85rem; }
+    .contact-form { background: var(--off-white); border-radius: var(--radius); padding: 36px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .form-group label { font-size: 0.82rem; font-weight: 600; color: var(--navy); }
+    .form-group input, .form-group textarea, .form-group select {
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      border: 1.5px solid #e0e8f5; background: var(--white);
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--navy);
+      outline: none; transition: border-color 0.2s;
+      resize: none;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--blue); }
+    .form-submit {
+      width: 100%; padding: 14px; background: var(--blue); color: var(--white);
+      border: none; border-radius: 99px; font-family: 'Sora', sans-serif;
+      font-weight: 700; font-size: 0.95rem; cursor: pointer;
+      transition: all 0.25s; box-shadow: 0 4px 20px rgba(58,134,255,0.35);
+    }
+    .form-submit:hover { background: var(--blue-light); transform: translateY(-2px); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy); padding: 60px 5% 30px;
+    }
+    .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+    .footer-brand p { color: rgba(255,255,255,0.45); font-size: 0.88rem; line-height: 1.7; margin: 16px 0 22px; max-width: 260px; }
+    .footer-social { display: flex; gap: 10px; }
+    .social-btn {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.6); font-size: 1rem; text-decoration: none;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .social-btn:hover { background: var(--blue); color: var(--white); }
+    .footer-col h4 { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--white); margin-bottom: 18px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul li a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.87rem; transition: color 0.2s; }
+    .footer-col ul li a:hover { color: var(--blue-light); }
+    .footer-bottom { max-width: 1200px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .footer-bottom p { color: rgba(255,255,255,0.35); font-size: 0.8rem; }
+    .footer-bottom-links { display: flex; gap: 20px; }
+    .footer-bottom-links a { color: rgba(255,255,255,0.35); text-decoration: none; font-size: 0.8rem; transition: color 0.2s; }
+    .footer-bottom-links a:hover { color: var(--white); }
+
+    /* ── STATS BAR ── */
+    .stats-bar { background: var(--blue); padding: 28px 5%; }
+    .stats-bar-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+    .stat-item { text-align: center; border-right: 1px solid rgba(255,255,255,0.2); }
+    .stat-item:last-child { border-right: none; }
+    .stat-val { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 2rem; color: var(--white); }
+    .stat-lbl { font-size: 0.8rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+    /* ── SCROLL ANIMATION ── */
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .packages-grid { grid-template-columns: repeat(2, 1fr); }
+      .monthly-grid { grid-template-columns: repeat(2, 1fr); }
+      .why-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .monthly-card.best { transform: none; }
+      .monthly-card.best:hover { transform: translateY(-8px); }
+      .stats-bar-inner { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+      .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 16px; }
+      .stat-item:nth-child(3), .stat-item:last-child { border-bottom: none; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .packages-grid { grid-template-columns: 1fr 1fr; }
+      .monthly-grid { grid-template-columns: 1fr 1fr; }
+      .why-grid { grid-template-columns: 1fr 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 10px; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .packages-grid { grid-template-columns: 1fr; }
+      .monthly-grid { grid-template-columns: 1fr; }
+      .why-grid { grid-template-columns: 1fr; }
+      .hero-btns { flex-direction: column; }
+      .btn-primary, .btn-outline { text-align: center; }
+      section { padding: 60px 5%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">G<span>TECH</span> ENTERPRISE</div>
+  <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#" class="nav-brand">
+    <img src="/mnt/user-data/uploads/WhatsApp_Image_2026-04-07_at_15_23_06.jpeg" alt="GTECH Logo" onerror="this.style.display='none'" />
+    G<span>TECH</span> ENTERPRISE
+  </a>
+  <ul class="nav-links">
+    <li><a href="#packages">Hotspot</a></li>
+    <li><a href="#monthly">Monthly</a></li>
+    <li><a href="#why">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get Connected</a>
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#packages" onclick="toggleMenu()">Hotspot Packages</a>
+  <a href="#monthly" onclick="toggleMenu()">Monthly Plans</a>
+  <a href="#why" onclick="toggleMenu()">Why Us</a>
+  <a href="#contact" onclick="toggleMenu()">Contact</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-circle"></div>
+  <div class="hero-bg-circle"></div>
+  <div class="hero-grid">
+    <div class="hero-content">
+      <div class="hero-badge">🌐 Now serving Nairobi & surrounds</div>
+      <h1>Fast, Reliable Internet for Your <em>Home & Business</em></h1>
+      <p>Affordable hotspot packages and high-speed monthly plans — connecting Nairobi one household at a time.</p>
+      <div class="hero-btns">
+        <a href="#packages" class="btn-primary">View Packages</a>
+        <a href="#contact" class="btn-outline">Get Connected</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-stack">
+        <div class="floating-pill">⚡ 50 Mbps Available</div>
+        <div class="speed-card">
+          <div class="speed-card-top">
+            <span class="speed-label">Download Speed</span>
+            <span class="speed-badge">● Live</span>
+          </div>
+          <div class="speed-num">20</div>
+          <div class="speed-unit">Mbps / Stable Connection</div>
+          <div class="speed-bars">
+            <div class="speed-bar" style="height:40%;animation-delay:0.1s"></div>
+            <div class="speed-bar" style="height:65%;animation-delay:0.2s"></div>
+            <div class="speed-bar" style="height:55%;animation-delay:0.3s"></div>
+            <div class="speed-bar" style="height:80%;animation-delay:0.4s"></div>
+            <div class="speed-bar" style="height:70%;animation-delay:0.5s"></div>
+            <div class="speed-bar" style="height:90%;animation-delay:0.6s"></div>
+            <div class="speed-bar" style="height:75%;animation-delay:0.7s"></div>
+            <div class="speed-bar" style="height:100%;animation-delay:0.8s"></div>
+          </div>
+          <div class="mini-stats">
+            <div class="mini-stat">
+              <div class="mini-stat-val">99.5%</div>
+              <div class="mini-stat-lbl">Uptime</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-val">24/7</div>
+              <div class="mini-stat-lbl">Support</div>
+            </div>
+          </div>
+        </div>
+        <div class="floating-pill">✓ 1,500+ Customers</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-bar-inner">
+    <div class="stat-item">
+      <div class="stat-val">1,500+</div>
+      <div class="stat-lbl">Happy Customers</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">99.5%</div>
+      <div class="stat-lbl">Network Uptime</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">50 Mbps</div>
+      <div class="stat-lbl">Max Speed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val">24/7</div>
+      <div class="stat-lbl">Customer Support</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOTSPOT PACKAGES -->
+<section id="packages">
+  <div class="section-inner">
+    <div class="reveal">
+      <span class="section-tag">Hotspot Plans</span>
+      <h2 class="section-title">Quick & Flexible Hotspot Packages</h2>
+      <p class="section-sub">Pay-as-you-go internet access. Perfect for quick browsing sessions. No commitments required.</p>
+    </div>
+    <div class="packages-grid">
+      <div class="pkg-card reveal">
+        <div class="pkg-icon">📱</div>
+        <div class="pkg-name">Lite Plan</div>
+        <div class="pkg-price">KES 10 <span>/session</span></div>
+        <div class="pkg-duration">⏱ 1 Hour Access</div>
+        <button class="pkg-buy" onclick="alert('Redirecting to payment for Lite Plan — KES 10')">Buy Now</button>
+      </div>
+      <div class="pkg-card reveal" style="transition-delay:0.1s">
+        <div class="pkg-icon">💻</div>
+        <div class="pkg-name">Basic Plan</div>
+        <div class="pkg-price">KES 20 <span>/session</span></div>
+        <div class="pkg-duration">⏱ 6 Hours Access</div>
+        <button class="pkg-buy" onclick="alert('Redirecting to payment for Basic Plan — KES 20')">Buy Now</button>
+      </div>
+      <div class="pkg-card popular reveal" style="transition-delay:0.2s">
+        <div class="popular-tag">POPULAR</div>
+        <div class="pkg-icon">🚀</div>
+        <div class="pkg-name">Standard Plan</div>
+        <div class="pkg-price">KES 30 <span>/session</span></div>
+        <div class="pkg-duration">⏱ 12 Hours Access</div>
+        <button class="pkg-buy" onclick="alert('Redirecting to payment for Standard Plan — KES 30')">Buy Now</button>
+      </div>
+      <div class="pkg-card reveal" style="transition-delay:0.3s">
+        <div class="pkg-icon">🌟</div>
+        <div class="pkg-name">Premium Plan</div>
+        <div class="pkg-price">KES 50 <span>/session</span></div>
+        <div class="pkg-duration">⏱ 24 Hours Access</div>
+        <button class="pkg-buy" onclick="alert('Redirecting to payment for Premium Plan — KES 50')">Buy Now</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MONTHLY PLANS -->
+<section id="monthly">
+  <div class="section-inner">
+    <div class="reveal">
+      <span class="section-tag">Monthly Plans</span>
+      <h2 class="section-title">Unlimited Monthly Subscriptions</h2>
+      <p class="section-sub">Consistent, high-speed internet for your home or office. Cancel anytime.</p>
+    </div>
+    <div class="monthly-grid">
+      <div class="monthly-card reveal">
+        <div class="monthly-icon">⚡</div>
+        <div class="monthly-speed">6</div>
+        <div class="monthly-speed-unit">Mbps</div>
+        <div class="monthly-price">KES 1,500</div>
+        <div class="monthly-period">per month</div>
+        <div class="monthly-feature">✓ Unlimited Data</div>
+        <div class="monthly-feature">✓ 24/7 Support</div>
+        <div class="monthly-feature">✓ Easy Setup</div>
+        <button class="monthly-btn" onclick="alert('Subscribe to 6 Mbps — KES 1,500/mo')">Subscribe Now</button>
+      </div>
+      <div class="monthly-card best reveal" style="transition-delay:0.1s">
+        <div class="best-badge">★ BEST VALUE</div>
+        <div class="monthly-icon">⚡</div>
+        <div class="monthly-speed">12</div>
+        <div class="monthly-speed-unit">Mbps</div>
+        <div class="monthly-price">KES 2,000</div>
+        <div class="monthly-period">per month</div>
+        <div class="monthly-feature">✓ Unlimited Data</div>
+        <div class="monthly-feature">✓ Priority Support</div>
+        <div class="monthly-feature">✓ Free Installation</div>
+        <button class="monthly-btn" onclick="alert('Subscribe to 12 Mbps — KES 2,000/mo')">Subscribe Now</button>
+      </div>
+      <div class="monthly-card reveal" style="transition-delay:0.2s">
+        <div class="monthly-icon">⚡</div>
+        <div class="monthly-speed">20</div>
+        <div class="monthly-speed-unit">Mbps</div>
+        <div class="monthly-price">KES 3,000</div>
+        <div class="monthly-period">per month</div>
+        <div class="monthly-feature">✓ Unlimited Data</div>
+        <div class="monthly-feature">✓ Dedicated Line</div>
+        <div class="monthly-feature">✓ Free Router</div>
+        <button class="monthly-btn" onclick="alert('Subscribe to 20 Mbps — KES 3,000/mo')">Subscribe Now</button>
+      </div>
+      <div class="monthly-card reveal" style="transition-delay:0.3s">
+        <div class="monthly-icon">🚀</div>
+        <div class="monthly-speed">50</div>
+        <div class="monthly-speed-unit">Mbps</div>
+        <div class="monthly-price">Custom</div>
+        <div class="monthly-period">contact for pricing</div>
+        <div class="monthly-feature">✓ Unlimited Data</div>
+        <div class="monthly-feature">✓ Business Grade</div>
+        <div class="monthly-feature">✓ SLA Guarantee</div>
+        <button class="monthly-btn" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Contact Us</button>
+      </div>
+    </div>
+    <p class="monthly-note reveal">📞 Call us at +254 757 113008 to discuss custom enterprise plans up to 50 Mbps</p>
+  </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section id="why">
+  <div class="section-inner">
+    <div class="reveal">
+      <span class="section-tag">Why GTECH</span>
+      <h2 class="section-title">Built for the Community</h2>
+      <p class="section-sub">We're not just an ISP — we're your neighbours. Here's why thousands trust GTECH Enterprise.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <div class="why-icon">⚡</div>
+        <div class="why-title">Fast & Stable Connection</div>
+        <div class="why-desc">Our fibre-backed network delivers consistent speeds so you can stream, work, and game without interruption.</div>
+      </div>
+      <div class="why-card reveal" style="transition-delay:0.1s">
+        <div class="why-icon">💰</div>
+        <div class="why-title">Affordable Pricing</div>
+        <div class="why-desc">Plans starting from KES 10. We believe fast internet should be accessible to everyone in the community.</div>
+      </div>
+      <div class="why-card reveal" style="transition-delay:0.2s">
+        <div class="why-icon">🛟</div>
+        <div class="why-title">24/7 Customer Support</div>
+        <div class="why-desc">Our local team is always available. Get help via WhatsApp, phone, or email — day or night.</div>
+      </div>
+      <div class="why-card reveal" style="transition-delay:0.3s">
+        <div class="why-icon">🔧</div>
+        <div class="why-title">Easy Setup</div>
+        <div class="why-desc">Our technicians handle everything. We'll have you connected quickly with minimal fuss and zero technical headaches.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <span class="section-tag">Contact Us</span>
+        <h3>Let's Get You Connected</h3>
+        <p>Ready to experience fast, reliable internet? Reach out to us and we'll have you set up in no time.</p>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div class="contact-text">
+            <strong>Phone / WhatsApp</strong>
+            <span>+254 757 113008</span>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">✉️</div>
+          <div class="contact-text">
+            <strong>Email</strong>
+            <span>jefferynjane@gmail.com</span>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div class="contact-text">
+            <strong>Location</strong>
+            <span>Nairobi, Kenya</span>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div class="contact-text">
+            <strong>Support Hours</strong>
+            <span>24/7 — Always Available</span>
+          </div>
+        </div>
+      </div>
+      <div class="contact-form reveal" style="transition-delay:0.2s">
+        <h4 style="font-family:'Sora',sans-serif;font-weight:700;font-size:1.1rem;color:var(--navy);margin-bottom:22px;">Send Us a Message</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" placeholder="John" />
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" placeholder="Doe" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" placeholder="+254 7XX XXX XXX" />
+        </div>
+        <div class="form-group">
+          <label>Interested In</label>
+          <select>
+            <option>Hotspot Package</option>
+            <option>Monthly Plan — 6 Mbps</option>
+            <option>Monthly Plan — 12 Mbps</option>
+            <option>Monthly Plan — 20 Mbps</option>
+            <option>Enterprise / 50 Mbps</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea rows="3" placeholder="Tell us your location and any questions…"></textarea>
+        </div>
+        <button class="form-submit" onclick="handleSubmit()">Send Message →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div style="font-family:'Sora',sans-serif;font-weight:800;font-size:1.2rem;color:var(--white);">
+        G<span style="color:var(--blue)">TECH</span> ENTERPRISE
+      </div>
+      <p>Fast, reliable, and affordable internet for homes and businesses in Nairobi and surrounding areas.</p>
+      <div class="footer-social">
+        <a class="social-btn" title="Facebook">f</a>
+        <a class="social-btn" title="WhatsApp">W</a>
+        <a class="social-btn" title="Instagram">in</a>
+        <a class="social-btn" title="Twitter">𝕏</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#packages">Hotspot Packages</a></li>
+        <li><a href="#monthly">Monthly Plans</a></li>
+        <li><a href="#why">Why Choose Us</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Plans</h4>
+      <ul>
+        <li><a href="#packages">KES 10 – 1 Hour</a></li>
+        <li><a href="#packages">KES 20 – 6 Hours</a></li>
+        <li><a href="#monthly">KES 1,500/mo – 6 Mbps</a></li>
+        <li><a href="#monthly">KES 2,000/mo – 12 Mbps</a></li>
+        <li><a href="#monthly">KES 3,000/mo – 20 Mbps</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <ul>
+        <li><a href="tel:+254757113008">+254 757 113008</a></li>
+        <li><a href="mailto:jefferynjane@gmail.com">jefferynjane@gmail.com</a></li>
+        <li><a href="#contact">Nairobi, Kenya</a></li>
+        <li><a href="#contact">24/7 Support</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 GTECH Enterprise. All rights reserved.</p>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Loader
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+    }, 1600);
+  });
+
+  // Navbar scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Mobile menu
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Form submit
+  function handleSubmit() {
+    const btn = document.querySelector('.form-submit');
+    btn.textContent = '✓ Message Sent!';
+    btn.style.background = '#27ae60';
+    setTimeout(() => {
+      btn.textContent = 'Send Message →';
+      btn.style.background = '';
+    }, 3000);
+  }
+
+  // Animated speed bars stagger
+  document.querySelectorAll('.speed-bar').forEach((bar, i) => {
+    bar.style.animationDelay = (i * 0.1) + 's';
+  });
+</script>
+</body>
+</html>
